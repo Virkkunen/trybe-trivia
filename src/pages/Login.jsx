@@ -35,6 +35,11 @@ class Login extends Component {
     dispatch(addUserInfo(username, email));
   };
 
+  handleClick = ({ target: { name } }) => {
+    const { history } = this.props;
+    history.push(`/${name}`);
+  };
+
   startGame = () => {
     const { history } = this.props;
     history.push('/game');
@@ -92,6 +97,15 @@ class Login extends Component {
           </button>
         </form>
         { loading && <p>Carregando</p>}
+
+        <button
+          type="button"
+          data-testid="btn-settings"
+          name="settings"
+          onClick={ this.handleClick }
+        >
+          Configurações
+        </button>
       </div>
     );
   }
