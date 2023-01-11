@@ -12,6 +12,7 @@ class Header extends Component {
   };
 
   render() {
+    const { username } = this.props;
     return (
       <div>
         Header
@@ -19,7 +20,13 @@ class Header extends Component {
           <img
             alt="user.name"
             src={ this.getAvatar() }
+            data-testid="header-profile-picture"
           />
+          <span
+            data-testid="header-player-name"
+          >
+            { username }
+          </span>
         </div>
       </div>
     );
@@ -28,7 +35,7 @@ class Header extends Component {
 
 Header.propTypes = {
   email: PropTypes.string.isRequired,
-  // email: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
