@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { addUserInfo } from '../redux/actions';
+import fetchToken from '../services/TriviaAPI';
 
 class Login extends Component {
   state = {
     loginDisabled: true,
     email: '',
     username: '',
+    loading: false,
   };
 
   validateButton = () => {
@@ -26,16 +28,33 @@ class Login extends Component {
     this.setState({ [name]: value }, this.validateButton);
   };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
+  sendUserInfo = () => {
     const { username, email } = this.state;
 
     const { dispatch } = this.props;
     dispatch(addUserInfo(username, email));
   };
 
+  startGame = () => {
+    const { history } = this.props;
+    history.push('/game');
+  };
+
+  getToken = async () => {
+    this.setState({ loading: true });
+    const token = await fetchToken();
+    localStorage.setItem('token', token);
+    this.setState({ loading: false }, this.startGame);
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.sendUserInfo();
+    this.getToken();
+  };
+
   render() {
-    const { loginDisabled, username, email } = this.state;
+    const { loginDisabled, username, email, loading } = this.state;
 
     return (
       <div>
@@ -72,6 +91,7 @@ class Login extends Component {
             Play!
           </button>
         </form>
+        { loading && <p>Carregando</p>}
       </div>
     );
   }
@@ -79,7 +99,7 @@ class Login extends Component {
 
 Login.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  // history: PropTypes.instanceOf(Object).isRequired,
+  history: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default connect()(Login);
