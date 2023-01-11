@@ -96,7 +96,7 @@ class Login extends Component {
             Play!
           </button>
         </form>
-        { loading && <p>Carregando</p>}
+        { loading && <p data-testid="loading-login">Carregando</p>}
 
         <button
           type="button"
