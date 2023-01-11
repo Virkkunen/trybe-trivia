@@ -35,11 +35,6 @@ class Login extends Component {
     dispatch(addUserInfo(username, email));
   };
 
-  handleClick = ({ target: { name } }) => {
-    const { history } = this.props;
-    history.push(`/${name}`);
-  };
-
   startGame = () => {
     const { history } = this.props;
     history.push('/game');
@@ -52,10 +47,20 @@ class Login extends Component {
     this.setState({ loading: false }, this.startGame);
   };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
+  sendInfoGetToken = () => {
     this.sendUserInfo();
     this.getToken();
+  };
+
+  handleClick = ({ target: { name } }) => {
+    const { history } = this.props;
+    if (name === 'game') this.sendInfoGetToken();
+    else history.push(`/${name}`);
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.sendInfoGetToken();
   };
 
   render() {
@@ -77,7 +82,8 @@ class Login extends Component {
               onChange={ this.handleChange }
             />
           </label>
-          <label htmlFor="username-input">
+
+          <label htmlFor="email-input">
             Email:
             <input
               type="email"
@@ -92,6 +98,8 @@ class Login extends Component {
             type="submit"
             data-testid="btn-play"
             disabled={ loginDisabled }
+            name="game"
+            onClick={ this.handleClick }
           >
             Play!
           </button>
