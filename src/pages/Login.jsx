@@ -56,6 +56,7 @@ class Login extends Component {
     const { history } = this.props;
     if (name === 'game') this.sendInfoGetToken();
     else history.push(`/${name}`);
+    // xgh
   };
 
   handleSubmit = (e) => {
