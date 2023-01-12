@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import Timer from './Timer';
+
+const ONE_SECOND = 1000;
 
 class Trivia extends Component {
   state = {
@@ -10,7 +13,9 @@ class Trivia extends Component {
     incorrect: '',
     shuffeBut: [],
     loading: false,
-
+    initialInterval: 5,
+    intervalDone: false,
+    buttonsDisabled: true,
   };
 
   componentDidMount() {
@@ -23,10 +28,38 @@ class Trivia extends Component {
       this.setState({
         shuffeBut: shuffledButtons,
         loading: false,
-
-      });
+      }, this.setInitialInterval);
     }
   }
+
+  componentDidUpdate() {
+    const { initialInterval, intervalDone } = this.state;
+    const { timerDone } = this.props;
+    if (initialInterval === 0 && !intervalDone) {
+      this.stopInterval();
+      this.setState({ intervalDone: true, buttonsDisabled: false });
+    }
+    if (timerDone && initialInterval === 0) {
+      this.setState({ buttonsDisabled: true, initialInterval: 5 });
+    }
+    // if (!localTimerDone) {
+    //   this.setState({ localTimerDone: timerDone });
+    // }
+  }
+
+  componentWillUnmount() {
+    this.stopInterval();
+  }
+
+  stopInterval = () => {
+    clearInterval(this.intervalId);
+  };
+
+  setInitialInterval = () => {
+    this.intervalId = setInterval(() => {
+      this.setState((prevState) => ({ initialInterval: prevState.initialInterval - 1 }));
+    }, ONE_SECOND);
+  };
 
   onChooseCorrect = () => {
     this.setState({
@@ -86,10 +119,19 @@ class Trivia extends Component {
 
   render() {
     const { questions, isTokenValid } = this.props;
-    const { index, shuffeBut, loading, correct, incorrect } = this.state;
+    const {
+      index,
+      shuffeBut,
+      loading,
+      correct,
+      incorrect,
+      intervalDone,
+      buttonsDisabled,
+    } = this.state;
 
     return (
       <div>
+        { intervalDone && <Timer />}
         {
           (isTokenValid) ? (
             <div>
@@ -114,6 +156,7 @@ class Trivia extends Component {
                                 key={ e.type }
                                 type="button"
                                 data-testid="correct-answer"
+                                disabled={ buttonsDisabled }
                               >
                                 {e.answer}
                               </button>
@@ -126,6 +169,7 @@ class Trivia extends Component {
                               type="button"
                               data-testid={ `wrong-answer-${e.Index}` }
                               className={ incorrect && 'incorrect-answer' }
+                              disabled={ buttonsDisabled }
                             >
                               {e.answer}
                             </button>
@@ -153,9 +197,12 @@ Trivia.propTypes = {
   questions: PropTypes.oneOfType([PropTypes.arrayOf]),
   category: PropTypes.string,
   isTokenValid: PropTypes.bool.isRequired,
+  timerDone: PropTypes.bool.isRequired,
+  // timerActive: PropTypes.bool.isRequired,
 };
 const mapStateToProps = (state) => ({
   ...state.game,
+  ...state.timer,
 });
 
 export default connect(mapStateToProps)(Trivia);
