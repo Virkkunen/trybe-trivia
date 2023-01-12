@@ -21,9 +21,12 @@ export const addPlayerInfo = (score) => ({
 function requestStarted() {
   return { type: 'REQUEST_STARTED' };
 }
-function requestSuccessful(choices) {
+function requestSuccessful(choices, TokenIsValid) {
+  console.log(TokenIsValid);
   return { type: 'REQUEST_SUCCESSFUL',
     payload: choices,
+    token: TokenIsValid,
+
   };
 }
 function requestFailed(error) {
@@ -34,6 +37,7 @@ function requestFailed(error) {
 }
 
 export function fetchAPIQuestions(token) {
+  const THREE = 3;
   return async (dispatch) => {
     dispatch(requestStarted());
     console.log('REQUEST_STARTED');
@@ -41,7 +45,12 @@ export function fetchAPIQuestions(token) {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
       const data = await response.json();
 
-      dispatch(requestSuccessful(data.results));
+      if (data.response_code !== THREE) {
+        dispatch(requestSuccessful(data.results, true));
+      } else {
+        dispatch(requestSuccessful(data.results, false));
+      }
+
       console.log('REQUEST_SUCCESSFUL');
     } catch (error) {
       dispatch(requestFailed(error));
