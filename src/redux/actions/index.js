@@ -3,6 +3,7 @@ export const ADD_PLAYER_INFO = 'ADD_PLAYER_INFO';
 export const REQUEST_FAILED = 'REQUEST_FAILED';
 export const REQUEST_STARTED = 'REQUEST_STARTED';
 export const REQUEST_SUCCESSFUL = 'REQUEST_SUCCESSFUL';
+export const SET_TIMER_INFO = 'SET_TIMER_INFO';
 
 export const addUserInfo = (username, email) => ({
   type: ADD_USER_INFO,
@@ -58,3 +59,11 @@ export function fetchAPIQuestions(token) {
     }
   };
 }
+
+export const setTimerInfo = (timerActive, timerDone) => ({
+  type: SET_TIMER_INFO,
+  payload: {
+    timerActive,
+    timerDone,
+  },
+});

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import Timer from './Timer';
 
 class Trivia extends Component {
   state = {
@@ -10,7 +11,6 @@ class Trivia extends Component {
     incorrect: '',
     shuffeBut: [],
     loading: false,
-
   };
 
   componentDidMount() {
@@ -90,6 +90,7 @@ class Trivia extends Component {
 
     return (
       <div>
+        { !loading && <Timer />}
         {
           (isTokenValid) ? (
             <div>
@@ -153,9 +154,12 @@ Trivia.propTypes = {
   questions: PropTypes.oneOfType([PropTypes.arrayOf]),
   category: PropTypes.string,
   isTokenValid: PropTypes.bool.isRequired,
+  // timerDone: PropTypes.bool.isRequired,
+  // timerActive: PropTypes.bool.isRequired,
 };
 const mapStateToProps = (state) => ({
   ...state.game,
+  ...state.timer,
 });
 
 export default connect(mapStateToProps)(Trivia);
