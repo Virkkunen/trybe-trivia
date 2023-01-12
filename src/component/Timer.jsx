@@ -8,8 +8,8 @@ const ONE_SECOND = 1000;
 class Timer extends Component {
   state = {
     seconds: 30,
-    // timerActive: false,
-    // timerDone: false,
+    localTimerActive: false,
+    localTimerDone: false,
   };
 
   componentDidMount() {
@@ -17,9 +17,8 @@ class Timer extends Component {
   }
 
   componentDidUpdate() {
-    const { seconds } = this.state;
-    const { timerActive, timerDone } = this.props;
-    if (seconds === 0 && !timerDone && timerActive) this.stopInterval();
+    const { seconds, localTimerActive, localTimerDone } = this.state;
+    if (seconds === 0 && !localTimerDone && localTimerActive) this.stopInterval();
   }
 
   componentWillUnmount() {
@@ -32,6 +31,7 @@ class Timer extends Component {
     const active = true;
     const done = false;
     dispatch(setTimerInfo(active, done));
+    this.setState({ localTimerActive: true });
 
     this.intervalId = setInterval(() => {
       this.setState((prevState) => ({ seconds: prevState.seconds - 1 }));
@@ -41,7 +41,7 @@ class Timer extends Component {
   stopInterval = () => {
     const { dispatch } = this.props;
     clearInterval(this.intervalId);
-    // this.setState({ timerActive: false, timerDone: true });
+    this.setState({ localTimerActive: false, localTimerDone: true });
     const active = false;
     const done = true;
     dispatch(setTimerInfo(active, done));
@@ -61,14 +61,14 @@ class Timer extends Component {
   }
 }
 
-Timer.defaultProps = {
-  timerDone: false,
-  timerActive: false,
-};
+// Timer.defaultProps = {
+//   timerDone: false,
+//   timerActive: false,
+// };
 
 Timer.propTypes = {
-  timerDone: PropTypes.bool,
-  timerActive: PropTypes.bool,
+  // timerDone: PropTypes.bool,
+  // timerActive: PropTypes.bool,
   dispatch: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => ({
