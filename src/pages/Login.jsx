@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { addUserInfo } from '../redux/actions';
+import { addUserInfo, fetchAPIQuestions } from '../redux/actions';
 import fetchToken from '../services/TriviaAPI';
 
 class Login extends Component {
@@ -37,6 +37,9 @@ class Login extends Component {
 
   startGame = () => {
     const { history } = this.props;
+    const { dispatch } = this.props;
+    const token = localStorage.getItem('token');
+    dispatch(fetchAPIQuestions(token));
     history.push('/game');
   };
 
