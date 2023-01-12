@@ -6,7 +6,42 @@ import { connect } from 'react-redux';
 class Trivia extends Component {
   state = {
     index: 0,
+    correct: '',
+    incorrect: '',
+    shuffeBut: [],
+    loading: false,
 
+  };
+
+  componentDidMount() {
+    const { isTokenValid } = this.props;
+    if (isTokenValid) {
+      this.setState({
+        loading: true,
+      });
+      const shuffledButtons = this.shuffleButtons();
+      this.setState({
+        shuffeBut: shuffledButtons,
+        loading: false,
+
+      });
+    }
+  }
+
+  onChooseCorrect = () => {
+    this.setState({
+      correct: true,
+      incorrect: true,
+
+    });
+  };
+
+  onChooseIncorrect = () => {
+    this.setState({
+      incorrect: true,
+      correct: true,
+
+    });
   };
 
   shuffle = (array) => {
@@ -46,55 +81,63 @@ class Trivia extends Component {
     });
     const totalAnswers = [...incorrectAnswers, correctAnswer];
     const shuffledArray = this.shuffle(totalAnswers);
-    return (
-      <div data-testid="answer-options">
-        {
-
-          shuffledArray.map((e) => {
-            if (e.type === 'correct_answer') {
-              return (
-                <button key={ e.type } type="button" data-testid="correct-answer">
-                  {e.answer}
-                </button>
-              );
-            }
-            return (
-              <button
-                key={ e.Index }
-                type="button"
-                data-testid={ `wrong-answer-${e.Index}` }
-              >
-                {e.answer}
-              </button>
-            );
-          })
-        }
-
-      </div>
-    );
+    return shuffledArray;
   };
 
   render() {
-    const { questions } = this.props;
-    const { index } = this.state;
+    const { questions, isTokenValid } = this.props;
+    const { index, shuffeBut, loading, correct, incorrect } = this.state;
 
     return (
       <div>
         {
-          (questions.length === 0) ? <Redirect to="/" />
-            : (
-              <div>
-                <h2 data-testid="question-category">
-                  {questions[index].category }
-                  {' '}
-                </h2>
-                <h3 data-testid="question-text">{questions[index].question}</h3>
+          (isTokenValid) ? (
+            <div>
+              <h2 data-testid="question-category">
+                {questions[index].category }
+                {' '}
+              </h2>
+              <h3 data-testid="question-text">{questions[index].question}</h3>
 
-                {
-                  this.shuffleButtons()
-                }
-              </div>
-            )
+              {
+                !loading
+                  && (
+                    <div data-testid="answer-options">
+                      {
+
+                        shuffeBut.map((e) => {
+                          if (e.type === 'correct_answer') {
+                            return (
+                              <button
+                                onClick={ this.onChooseCorrect }
+                                className={ correct && 'correct-answer' }
+                                key={ e.type }
+                                type="button"
+                                data-testid="correct-answer"
+                              >
+                                {e.answer}
+                              </button>
+                            );
+                          }
+                          return (
+                            <button
+                              onClick={ this.onChooseIncorrect }
+                              key={ e.Index }
+                              type="button"
+                              data-testid={ `wrong-answer-${e.Index}` }
+                              className={ incorrect && 'incorrect-answer' }
+                            >
+                              {e.answer}
+                            </button>
+                          );
+                        })
+                      }
+
+                    </div>
+                  )
+              }
+            </div>
+          ) : <Redirect to="/" />
         }
       </div>
 
@@ -109,6 +152,7 @@ Trivia.defaultProps = {
 Trivia.propTypes = {
   questions: PropTypes.oneOfType([PropTypes.arrayOf]),
   category: PropTypes.string,
+  isTokenValid: PropTypes.bool.isRequired,
 };
 const mapStateToProps = (state) => ({
   ...state.game,
