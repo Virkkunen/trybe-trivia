@@ -53,7 +53,7 @@ class Trivia extends Component {
           shuffledArray.map((e) => {
             if (e.type === 'correct_answer') {
               return (
-                <button type="button" data-testid="correct-answer">
+                <button key={ e.type } type="button" data-testid="correct-answer">
                   {e.answer}
                 </button>
               );
@@ -101,9 +101,14 @@ class Trivia extends Component {
     );
   }
 }
+Trivia.defaultProps = {
+  questions: [],
+  category: '',
+};
+
 Trivia.propTypes = {
-  questions: PropTypes.arrayOf.isRequired,
-  category: PropTypes.string.isRequired,
+  questions: PropTypes.oneOfType([PropTypes.arrayOf]),
+  category: PropTypes.string,
 };
 const mapStateToProps = (state) => ({
   ...state.game,
