@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   questions: [],
   error: '',
   loading: false,
+  isTokenValid: false,
 
 };
 
@@ -25,6 +26,7 @@ const game = (state = INITIAL_STATE, action) => {
       ...state,
       questions: action.payload,
       loading: false,
+      isTokenValid: action.token,
     };
   default: return state;
   }
