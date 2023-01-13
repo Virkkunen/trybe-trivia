@@ -20,6 +20,7 @@ class Trivia extends Component {
     buttonsDisabled: true,
     difficulty: '',
     difficultyPoints: 0,
+    redirect: false,
   };
 
   componentDidMount() {
@@ -79,7 +80,7 @@ class Trivia extends Component {
     const { index } = this.state;
     const totalQ = questions.length;
 
-    if (index < totalQ) {
+    if (index < totalQ - 1) {
       this.setState((prevState) => ({
         index: prevState.index + 1,
         correct: false,
@@ -89,7 +90,9 @@ class Trivia extends Component {
         this.changeQuestion();
         dispatch(funcStartTime(true));
       });
+      return;
     }
+    this.setState({ index: 0, redirect: true });
   };
 
   convertDifficulty = () => {
@@ -183,6 +186,7 @@ class Trivia extends Component {
       incorrect,
       intervalDone,
       buttonsDisabled,
+      redirect,
     } = this.state;
 
     return (
@@ -244,18 +248,14 @@ class Trivia extends Component {
             </div>
           ) : <Redirect to="/" />
         }
+        { redirect && <Redirect to="/feedbacks" />}
       </div>
-
     );
   }
 }
-Trivia.defaultProps = {
-  questions: [],
-  category: '',
-};
 Trivia.propTypes = {
-  questions: PropTypes.oneOfType([PropTypes.array]),
-  category: PropTypes.string,
+  questions: PropTypes.oneOfType([PropTypes.array]).isRequired,
+  category: PropTypes.string.isRequired,
   isTokenValid: PropTypes.bool.isRequired,
   timerDone: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
