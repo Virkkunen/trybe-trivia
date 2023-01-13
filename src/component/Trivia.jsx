@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Timer from './Timer';
-import { addPlayerInfo, funcStartTime, funcStopTime } from '../redux/actions';
+import { addPlayerInfo, funcStartTime, funcStopTime,
+  correctChoose } from '../redux/actions';
 import shuffle from '../services/shuffle';
 import triviaState from './states/triviaState';
 import triviaPropTypes from './propTypes/triviaPropTypes';
@@ -122,6 +123,7 @@ class Trivia extends Component {
     });
     await dispatch(funcStopTime(true));
     await dispatch(addPlayerInfo(this.calculateScore()));
+    await dispatch(correctChoose(1));
   };
 
   onChooseIncorrect = async () => {

@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
+import FeedBackMessage from '../component/FeedBackMessage';
 import Header from '../component/Header';
 
-export default class Feedbacks extends Component {
+class Feedbacks extends Component {
   render() {
     return (
       <div data-testid="feedback-text">
         <Header />
-        Feedbacks
+        <FeedBackMessage />
       </div>
     );
   }
 }
+
+export default Feedbacks;
