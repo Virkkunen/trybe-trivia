@@ -1,7 +1,8 @@
-import { ADD_PLAYER_INFO } from '../actions';
+import { ADD_PLAYER_INFO, CORRECT_CHOOSE } from '../actions';
 
 const INITIAL_STATE = {
   score: 0,
+  assertions: 0,
 };
 
 const player = (state = INITIAL_STATE, action) => {
@@ -9,7 +10,12 @@ const player = (state = INITIAL_STATE, action) => {
   case ADD_PLAYER_INFO:
     return {
       ...state,
-      score: state.score + action.payload,
+      score: Number(state.score + action.payload),
+    };
+  case CORRECT_CHOOSE:
+    return {
+      ...state,
+      assertions: Number(state.assertions + action.payload),
     };
   default: return state;
   }
