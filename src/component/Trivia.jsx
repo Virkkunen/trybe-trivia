@@ -1,25 +1,16 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Timer from './Timer';
-import { addPlayerInfo, funcStopTime } from '../redux/actions';
+import { addPlayerInfo, funcStartTime, funcStopTime } from '../redux/actions';
+import shuffle from '../services/shuffle';
+import triviaState from './states/triviaState';
+import triviaPropTypes from './propTypes/triviaPropTypes';
 
 const ONE_SECOND = 1000;
 
 class Trivia extends Component {
-  state = {
-    index: 0,
-    correct: '',
-    incorrect: '',
-    shuffeBut: [],
-    loading: false,
-    initialInterval: 5,
-    intervalDone: false,
-    buttonsDisabled: true,
-    difficulty: '',
-    difficultyPoints: 0,
-  };
+  state = { ...triviaState }; // XGH
 
   componentDidMount() {
     const { isTokenValid } = this.props;
@@ -27,11 +18,7 @@ class Trivia extends Component {
       this.setState({
         loading: true,
       });
-      const shuffledButtons = this.shuffleButtons();
-      this.setState({
-        shuffeBut: shuffledButtons,
-        loading: false,
-      }, () => { this.setInitialInterval(); this.changeDifficulty(); });
+      this.changeQuestion();
     }
   }
 
@@ -57,6 +44,36 @@ class Trivia extends Component {
     this.setState({
       difficulty: questions[index].difficulty,
     }, this.convertDifficulty);
+  };
+
+  changeQuestion = () => {
+    const shuffledButtons = this.shuffleButtons();
+    this.setState({
+      shuffeBut: shuffledButtons,
+      loading: false,
+    }, () => {
+      this.setInitialInterval();
+      this.changeDifficulty();
+    });
+  };
+
+  nextQuestion = () => {
+    const { questions, dispatch } = this.props;
+    const { index } = this.state;
+    const totalQ = questions.length;
+    if (index < totalQ - 1) {
+      this.setState((prevState) => ({
+        index: prevState.index + 1,
+        correct: false,
+        incorrect: false,
+        buttonsDisabled: false,
+      }), () => {
+        this.changeQuestion();
+        dispatch(funcStartTime(true));
+      });
+      return;
+    }
+    this.setState({ index: 0, redirect: true });
   };
 
   convertDifficulty = () => {
@@ -89,9 +106,16 @@ class Trivia extends Component {
     }, ONE_SECOND);
   };
 
+  calculateScore = () => {
+    const TEN = 10;
+    const { secondsLeft } = this.props;
+    const { difficultyPoints } = this.state;
+    const score = TEN + (secondsLeft * difficultyPoints);
+    return score;
+  };
+
   onChooseCorrect = async () => {
     const { dispatch } = this.props;
-
     this.setState({
       correct: true,
       incorrect: true,
@@ -102,45 +126,16 @@ class Trivia extends Component {
 
   onChooseIncorrect = async () => {
     const { dispatch } = this.props;
-
     this.setState({
       incorrect: true,
       correct: true,
     });
     await dispatch(funcStopTime(true));
-    // await dispatch(addPlayerInfo(this.calculateScore()));
-  };
-
-  calculateScore = () => {
-    const TEN = 10;
-    const { secondsLeft } = this.props;
-    const { difficultyPoints } = this.state;
-    const score = TEN + (secondsLeft * difficultyPoints);
-    return score;
-  };
-
-  shuffle = (array) => {
-    let currentIndex = array.length;
-    let randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex !== 0) {
-      // Pick a remaining element.
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
   };
 
   shuffleButtons = () => {
     const { questions } = this.props;
     const { index } = this.state;
-
     const correctAnswer = {
       type: 'correct_answer',
       answer: questions[index].correct_answer,
@@ -155,7 +150,7 @@ class Trivia extends Component {
       return elementIncorrect;
     });
     const totalAnswers = [...incorrectAnswers, correctAnswer];
-    const shuffledArray = this.shuffle(totalAnswers);
+    const shuffledArray = shuffle(totalAnswers);
     return shuffledArray;
   };
 
@@ -169,6 +164,7 @@ class Trivia extends Component {
       incorrect,
       intervalDone,
       buttonsDisabled,
+      redirect,
     } = this.state;
 
     return (
@@ -182,13 +178,11 @@ class Trivia extends Component {
                 {' '}
               </h2>
               <h3 data-testid="question-text">{questions[index].question}</h3>
-
               {
                 !loading
                   && (
                     <div data-testid="answer-options">
                       {
-
                         shuffeBut.map((e) => {
                           if (e.type === 'correct_answer') {
                             return (
@@ -218,30 +212,26 @@ class Trivia extends Component {
                           );
                         })
                       }
-
                     </div>
                   )
               }
+              { correct && (
+                <button
+                  type="button"
+                  data-testid="btn-next"
+                  onClick={ this.nextQuestion }
+                >
+                  Próxima
+                </button>) }
             </div>
           ) : <Redirect to="/" />
         }
+        { redirect && <Redirect to="/feedbacks" />}
       </div>
-
     );
   }
 }
-Trivia.defaultProps = {
-  questions: [],
-  category: '',
-};
-Trivia.propTypes = {
-  questions: PropTypes.oneOfType([PropTypes.array]),
-  category: PropTypes.string,
-  isTokenValid: PropTypes.bool.isRequired,
-  timerDone: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
-  secondsLeft: PropTypes.number.isRequired,
-};
+Trivia.propTypes = { ...triviaPropTypes };
 const mapStateToProps = (state) => ({
   ...state.game,
   ...state.timer,

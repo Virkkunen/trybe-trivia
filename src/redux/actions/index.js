@@ -5,6 +5,7 @@ export const REQUEST_STARTED = 'REQUEST_STARTED';
 export const REQUEST_SUCCESSFUL = 'REQUEST_SUCCESSFUL';
 export const SET_TIMER_INFO = 'SET_TIMER_INFO';
 export const STOP_TIME = 'STOP_TIME';
+export const START_TIME = 'START_TIME';
 export const SEND_SECS = 'SEND_SECS';
 
 export const addUserInfo = (username, email) => ({
@@ -73,5 +74,9 @@ export const funcStopTime = (stop, secs) => ({
   type: STOP_TIME,
   payload: stop,
   secondsLeft: secs,
+});
 
+export const funcStartTime = (start) => ({
+  type: START_TIME,
+  payload: start,
 });

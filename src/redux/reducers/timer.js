@@ -1,8 +1,9 @@
-import { SET_TIMER_INFO, STOP_TIME } from '../actions';
+import { SET_TIMER_INFO, STOP_TIME, START_TIME } from '../actions';
 
 const INITIAL_STATE = {
   secondsLeft: 0,
   stopTime: false,
+  startTime: false,
   timerActive: false,
   timerDone: false,
 };
@@ -21,7 +22,12 @@ const timer = (state = INITIAL_STATE, action) => {
       ...state,
       stopTime: action.payload,
       secondsLeft: action.secondsLeft,
+    };
 
+  case START_TIME:
+    return {
+      ...state,
+      startTime: action.payload,
     };
 
   default: return state;

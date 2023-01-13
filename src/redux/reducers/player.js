@@ -9,7 +9,7 @@ const player = (state = INITIAL_STATE, action) => {
   case ADD_PLAYER_INFO:
     return {
       ...state,
-      score: action.payload,
+      score: state.score + action.payload,
     };
   default: return state;
   }

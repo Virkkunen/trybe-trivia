@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setTimerInfo, funcStopTime } from '../redux/actions';
+import { setTimerInfo, funcStopTime, funcStartTime } from '../redux/actions';
 
 const ONE_SECOND = 1000;
 
@@ -19,6 +19,7 @@ class Timer extends Component {
   componentDidUpdate() {
     const { seconds, localTimerActive, localTimerDone } = this.state;
     this.timeStoper();
+    this.timeStarter();
     if (seconds === 0 && !localTimerDone && localTimerActive) this.stopInterval();
   }
 
@@ -35,8 +36,17 @@ class Timer extends Component {
     }
   };
 
+  timeStarter = async () => {
+    const { dispatch, startTime } = this.props;
+    if (startTime) {
+      this.startTimer();
+      await dispatch(funcStartTime(false));
+    }
+  };
+
   startTimer = () => {
     const { dispatch } = this.props;
+    this.setState({ seconds: 30 });
     // this.setState({ timerActive: true, timerDone: false });
     const active = true;
     const done = false;
@@ -80,6 +90,7 @@ Timer.propTypes = {
   // timerDone: PropTypes.bool,
   // timerActive: PropTypes.bool,
   stopTime: PropTypes.bool.isRequired,
+  startTime: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => ({
