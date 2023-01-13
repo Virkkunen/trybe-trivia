@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Timer from './Timer';
 import { addPlayerInfo, funcStopTime } from '../redux/actions';
+import shuffle from '../services/shuffle';
 
 const ONE_SECOND = 1000;
 
@@ -119,24 +120,6 @@ class Trivia extends Component {
     return score;
   };
 
-  shuffle = (array) => {
-    let currentIndex = array.length;
-    let randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex !== 0) {
-      // Pick a remaining element.
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
-  };
-
   shuffleButtons = () => {
     const { questions } = this.props;
     const { index } = this.state;
@@ -155,7 +138,7 @@ class Trivia extends Component {
       return elementIncorrect;
     });
     const totalAnswers = [...incorrectAnswers, correctAnswer];
-    const shuffledArray = this.shuffle(totalAnswers);
+    const shuffledArray = shuffle(totalAnswers);
     return shuffledArray;
   };
 
