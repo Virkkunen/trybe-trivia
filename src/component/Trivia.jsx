@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Timer from './Timer';
 import { addPlayerInfo, funcStopTime } from '../redux/actions';
 import shuffle from '../services/shuffle';
+import calculateScore from '../services/calculateScore';
 
 const ONE_SECOND = 1000;
 
@@ -91,14 +92,15 @@ class Trivia extends Component {
   };
 
   onChooseCorrect = async () => {
-    const { dispatch } = this.props;
+    const { dispatch, secondsLeft } = this.props;
+    const { difficultyPoints } = this.state;
 
     this.setState({
       correct: true,
       incorrect: true,
     });
     await dispatch(funcStopTime(true));
-    await dispatch(addPlayerInfo(this.calculateScore()));
+    await dispatch(addPlayerInfo(calculateScore(difficultyPoints, secondsLeft)));
   };
 
   onChooseIncorrect = async () => {
@@ -110,14 +112,6 @@ class Trivia extends Component {
     });
     await dispatch(funcStopTime(true));
     // await dispatch(addPlayerInfo(this.calculateScore()));
-  };
-
-  calculateScore = () => {
-    const TEN = 10;
-    const { secondsLeft } = this.props;
-    const { difficultyPoints } = this.state;
-    const score = TEN + (secondsLeft * difficultyPoints);
-    return score;
   };
 
   shuffleButtons = () => {
