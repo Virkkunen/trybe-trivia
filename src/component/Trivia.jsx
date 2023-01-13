@@ -235,13 +235,13 @@ Trivia.defaultProps = {
   questions: [],
   category: '',
 };
-
 Trivia.propTypes = {
   questions: PropTypes.oneOfType([PropTypes.array]),
   category: PropTypes.string,
   isTokenValid: PropTypes.bool.isRequired,
   timerDone: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
+  secondsLeft: PropTypes.number.isRequired,
 };
 const mapStateToProps = (state) => ({
   ...state.game,
