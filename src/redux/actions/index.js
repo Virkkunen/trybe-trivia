@@ -7,6 +7,7 @@ export const SET_TIMER_INFO = 'SET_TIMER_INFO';
 export const STOP_TIME = 'STOP_TIME';
 export const START_TIME = 'START_TIME';
 export const SEND_SECS = 'SEND_SECS';
+export const CORRECT_CHOOSE = 'CORRECT_CHOOSE';
 
 export const addUserInfo = (username, email) => ({
   type: ADD_USER_INFO,
@@ -79,4 +80,9 @@ export const funcStopTime = (stop, secs) => ({
 export const funcStartTime = (start) => ({
   type: START_TIME,
   payload: start,
+});
+
+export const correctChoose = (point) => ({
+  type: CORRECT_CHOOSE,
+  payload: point,
 });
