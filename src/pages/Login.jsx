@@ -35,10 +35,14 @@ class Login extends Component {
     dispatch(addUserInfo(username, email));
   };
 
+  saveUserInfo = () => {
+  };
+
   startGame = () => {
     const { history } = this.props;
     const { dispatch } = this.props;
     const token = localStorage.getItem('token');
+    this.saveUserInfo();
     dispatch(fetchAPIQuestions(token));
     history.push('/game');
   };

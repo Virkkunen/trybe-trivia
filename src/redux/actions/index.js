@@ -9,11 +9,12 @@ export const START_TIME = 'START_TIME';
 export const SEND_SECS = 'SEND_SECS';
 export const CORRECT_CHOOSE = 'CORRECT_CHOOSE';
 
-export const addUserInfo = (username, email) => ({
+export const addUserInfo = (username, email, avatar = '') => ({
   type: ADD_USER_INFO,
   payload: {
     username,
     email,
+    avatar,
   },
 });
 
