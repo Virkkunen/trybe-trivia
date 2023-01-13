@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Timer from './Timer';
-import { addPlayerInfo, funcStopTime } from '../redux/actions';
+import { addPlayerInfo, funcStartTime, funcStopTime } from '../redux/actions';
 import shuffle from '../services/shuffle';
-import calculateScore from '../services/calculateScore';
 
 const ONE_SECOND = 1000;
 
@@ -29,11 +28,12 @@ class Trivia extends Component {
       this.setState({
         loading: true,
       });
-      const shuffledButtons = this.shuffleButtons();
-      this.setState({
-        shuffeBut: shuffledButtons,
-        loading: false,
-      }, () => { this.setInitialInterval(); this.changeDifficulty(); });
+      this.changeQuestion();
+    //   const shuffledButtons = this.shuffleButtons();
+    //   this.setState({
+    //     shuffeBut: shuffledButtons,
+    //     loading: false,
+    //   }, () => { this.setInitialInterval(); this.changeDifficulty(); });
     }
   }
 
@@ -59,6 +59,37 @@ class Trivia extends Component {
     this.setState({
       difficulty: questions[index].difficulty,
     }, this.convertDifficulty);
+  };
+
+  changeQuestion = () => {
+    // const { dispatch } = this.props;
+    const shuffledButtons = this.shuffleButtons();
+    this.setState({
+      shuffeBut: shuffledButtons,
+      loading: false,
+    }, () => {
+      this.setInitialInterval();
+      this.changeDifficulty();
+      // dispatch(funcStartTime(true));
+    });
+  };
+
+  nextQuestion = () => {
+    const { questions, dispatch } = this.props;
+    const { index } = this.state;
+    const totalQ = questions.length;
+
+    if (index < totalQ) {
+      this.setState((prevState) => ({
+        index: prevState.index + 1,
+        correct: false,
+        incorrect: false,
+        buttonsDisabled: false,
+      }), () => {
+        this.changeQuestion();
+        dispatch(funcStartTime(true));
+      });
+    }
   };
 
   convertDifficulty = () => {
@@ -91,16 +122,22 @@ class Trivia extends Component {
     }, ONE_SECOND);
   };
 
-  onChooseCorrect = async () => {
-    const { dispatch, secondsLeft } = this.props;
+  calculateScore = () => {
+    const TEN = 10;
+    const { secondsLeft } = this.props;
     const { difficultyPoints } = this.state;
+    const score = TEN + (secondsLeft * difficultyPoints);
+    return score;
+  };
 
+  onChooseCorrect = async () => {
+    const { dispatch } = this.props;
     this.setState({
       correct: true,
       incorrect: true,
     });
     await dispatch(funcStopTime(true));
-    await dispatch(addPlayerInfo(calculateScore(difficultyPoints, secondsLeft)));
+    await dispatch(addPlayerInfo(this.calculateScore()));
   };
 
   onChooseIncorrect = async () => {
@@ -159,13 +196,11 @@ class Trivia extends Component {
                 {' '}
               </h2>
               <h3 data-testid="question-text">{questions[index].question}</h3>
-
               {
                 !loading
                   && (
                     <div data-testid="answer-options">
                       {
-
                         shuffeBut.map((e) => {
                           if (e.type === 'correct_answer') {
                             return (
@@ -195,10 +230,17 @@ class Trivia extends Component {
                           );
                         })
                       }
-
                     </div>
                   )
               }
+              { correct && (
+                <button
+                  type="button"
+                  data-testid="btn-next"
+                  onClick={ this.nextQuestion }
+                >
+                  Próxima
+                </button>) }
             </div>
           ) : <Redirect to="/" />
         }
