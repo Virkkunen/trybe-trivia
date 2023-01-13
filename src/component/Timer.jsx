@@ -90,6 +90,7 @@ Timer.propTypes = {
   // timerDone: PropTypes.bool,
   // timerActive: PropTypes.bool,
   stopTime: PropTypes.bool.isRequired,
+  startTime: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => ({
