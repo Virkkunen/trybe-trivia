@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Timer from './Timer';
+import { addPlayerInfo, funcStopTime } from '../redux/actions';
 
 const ONE_SECOND = 1000;
 
@@ -16,6 +17,8 @@ class Trivia extends Component {
     initialInterval: 5,
     intervalDone: false,
     buttonsDisabled: true,
+    difficulty: '',
+    difficultyPoints: 0,
   };
 
   componentDidMount() {
@@ -30,6 +33,7 @@ class Trivia extends Component {
         loading: false,
       }, this.setInitialInterval);
     }
+    this.changeDifficulty();
   }
 
   componentDidUpdate() {
@@ -42,14 +46,38 @@ class Trivia extends Component {
     if (timerDone && initialInterval === 0) {
       this.setState({ buttonsDisabled: true, initialInterval: 5 });
     }
-    // if (!localTimerDone) {
-    //   this.setState({ localTimerDone: timerDone });
-    // }
   }
 
   componentWillUnmount() {
     this.stopInterval();
   }
+
+  changeDifficulty = () => {
+    const { index } = this.state;
+    const { questions } = this.props;
+    this.setState({
+      difficulty: questions[index].difficulty,
+    }, this.convertDifficulty);
+  };
+
+  convertDifficulty = () => {
+    const { difficulty } = this.state;
+    if (difficulty === 'hard') {
+      this.setState({
+        difficultyPoints: 3,
+      });
+    }
+    if (difficulty === 'medium') {
+      this.setState({
+        difficultyPoints: 2,
+      });
+    }
+    if (difficulty === 'easy') {
+      this.setState({
+        difficultyPoints: 1,
+      });
+    }
+  };
 
   stopInterval = () => {
     clearInterval(this.intervalId);
@@ -57,24 +85,39 @@ class Trivia extends Component {
 
   setInitialInterval = () => {
     this.intervalId = setInterval(() => {
-      this.setState((prevState) => ({ initialInterval: prevState.initialInterval - 1 }));
+      this.setState((prevState) => ({ initialInterval: prevState.initialInterval - 1,
+      }));
     }, ONE_SECOND);
   };
 
-  onChooseCorrect = () => {
+  onChooseCorrect = async () => {
+    const { dispatch } = this.props;
+
     this.setState({
       correct: true,
       incorrect: true,
-
     });
+    await dispatch(funcStopTime(true));
+    await dispatch(addPlayerInfo(this.calculateScore()));
   };
 
-  onChooseIncorrect = () => {
+  onChooseIncorrect = async () => {
+    const { dispatch } = this.props;
+
     this.setState({
       incorrect: true,
       correct: true,
-
     });
+    await dispatch(funcStopTime(true));
+    // await dispatch(addPlayerInfo(this.calculateScore()));
+  };
+
+  calculateScore = () => {
+    const TEN = 10;
+    const { secondsLeft } = this.props;
+    const { difficultyPoints } = this.state;
+    const score = TEN + (secondsLeft * difficultyPoints);
+    return score;
   };
 
   shuffle = (array) => {
@@ -194,15 +237,14 @@ Trivia.defaultProps = {
 };
 
 Trivia.propTypes = {
-  questions: PropTypes.oneOfType([PropTypes.arrayOf]),
+  questions: PropTypes.oneOfType([PropTypes.array]),
   category: PropTypes.string,
   isTokenValid: PropTypes.bool.isRequired,
   timerDone: PropTypes.bool.isRequired,
-  // timerActive: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => ({
   ...state.game,
   ...state.timer,
 });
-
 export default connect(mapStateToProps)(Trivia);

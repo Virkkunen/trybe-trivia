@@ -4,6 +4,8 @@ export const REQUEST_FAILED = 'REQUEST_FAILED';
 export const REQUEST_STARTED = 'REQUEST_STARTED';
 export const REQUEST_SUCCESSFUL = 'REQUEST_SUCCESSFUL';
 export const SET_TIMER_INFO = 'SET_TIMER_INFO';
+export const STOP_TIME = 'STOP_TIME';
+export const SEND_SECS = 'SEND_SECS';
 
 export const addUserInfo = (username, email) => ({
   type: ADD_USER_INFO,
@@ -15,9 +17,8 @@ export const addUserInfo = (username, email) => ({
 
 export const addPlayerInfo = (score) => ({
   type: ADD_PLAYER_INFO,
-  payload: {
-    score,
-  },
+  payload: score,
+
 });
 function requestStarted() {
   return { type: 'REQUEST_STARTED' };
@@ -66,4 +67,11 @@ export const setTimerInfo = (timerActive, timerDone) => ({
     timerActive,
     timerDone,
   },
+});
+
+export const funcStopTime = (stop, secs) => ({
+  type: STOP_TIME,
+  payload: stop,
+  secondsLeft: secs,
+
 });
