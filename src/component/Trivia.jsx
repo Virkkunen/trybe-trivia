@@ -31,9 +31,8 @@ class Trivia extends Component {
       this.setState({
         shuffeBut: shuffledButtons,
         loading: false,
-      }, this.setInitialInterval);
+      }, () => { this.setInitialInterval(); this.changeDifficulty(); });
     }
-    this.changeDifficulty();
   }
 
   componentDidUpdate() {
