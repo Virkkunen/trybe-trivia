@@ -3,13 +3,22 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import FeedBackMessage from '../component/FeedBackMessage';
 import Header from '../component/Header';
-import PlayAgainButton from '../component/PlayAgainButton';
-import RankingButton from '../component/RankingButton';
+import { resetGame, resetTimer } from '../redux/actions';
 
 class Feedbacks extends Component {
   componentDidMount() {
     this.saveUserInfo();
   }
+
+  buttonRedirect = ({ target: { name } }) => {
+    const { history, dispatch } = this.props;
+    if (name === 'ranking') return history.push('/ranking');
+    if (name === 'play-again') {
+      dispatch(resetGame(0));
+      dispatch(resetTimer());
+      return history.push('/');
+    }
+  };
 
   saveUserInfo = () => {
     const { username, email, avatar, score } = this.props;
@@ -38,8 +47,20 @@ class Feedbacks extends Component {
       <div data-testid="feedback-text">
         <Header />
         <FeedBackMessage />
-        <PlayAgainButton testId="btn-play-again" />
-        <RankingButton />
+        <button
+          type="button"
+          name="ranking"
+          onClick={ this.buttonRedirect }
+        >
+          Ranking
+        </button>
+        <button
+          type="button"
+          name="play-again"
+          onClick={ this.buttonRedirect }
+        >
+          Jogar Novamente
+        </button>
       </div>
     );
   }
@@ -55,6 +76,8 @@ Feedbacks.propTypes = {
   email: PropTypes.string.isRequired,
   avatar: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
+  history: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps)(Feedbacks);
