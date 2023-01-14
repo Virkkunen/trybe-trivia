@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import md5 from 'crypto-js/md5';
+import { addUserInfo } from '../redux/actions';
 
 class Header extends Component {
   getAvatar = () => {
-    const { email } = this.props;
+    const { username, email, dispatch } = this.props;
     const address = String(email).trim().toLowerCase();
     const hash = md5(address);
-    return `https://www.gravatar.com/avatar/${hash}`;
+    const avatar = `https://www.gravatar.com/avatar/${hash}`;
+    dispatch(addUserInfo(username, email, avatar));
+    return avatar;
   };
 
   render() {
@@ -40,6 +43,7 @@ Header.propTypes = {
   email: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({

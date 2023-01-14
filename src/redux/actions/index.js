@@ -8,12 +8,15 @@ export const STOP_TIME = 'STOP_TIME';
 export const START_TIME = 'START_TIME';
 export const SEND_SECS = 'SEND_SECS';
 export const CORRECT_CHOOSE = 'CORRECT_CHOOSE';
+export const RESET_GAME = 'RESET_GAME';
+export const RESET_TIMER = 'RESET_TIMER';
 
-export const addUserInfo = (username, email) => ({
+export const addUserInfo = (username, email, avatar = '') => ({
   type: ADD_USER_INFO,
   payload: {
     username,
     email,
+    avatar,
   },
 });
 
@@ -85,4 +88,14 @@ export const funcStartTime = (start) => ({
 export const correctChoose = (point) => ({
   type: CORRECT_CHOOSE,
   payload: point,
+});
+
+export const resetGame = (reset) => ({
+  type: RESET_GAME,
+  payload: reset,
+});
+
+export const resetTimer = () => ({
+  type: RESET_TIMER,
+  payload: '',
 });
