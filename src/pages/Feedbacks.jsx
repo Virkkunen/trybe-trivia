@@ -50,6 +50,7 @@ class Feedbacks extends Component {
         <button
           type="button"
           name="ranking"
+          data-testid="btn-ranking"
           onClick={ this.buttonRedirect }
         >
           Ranking
@@ -57,6 +58,7 @@ class Feedbacks extends Component {
         <button
           type="button"
           name="play-again"
+          data-testid="btn-play-again"
           onClick={ this.buttonRedirect }
         >
           Jogar Novamente

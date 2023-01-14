@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import PlayAgainButton from '../component/PlayAgainButton';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Players from '../component/Players';
+import { resetGame, resetTimer } from '../redux/actions';
 
-export default class Ranking extends Component {
+class Ranking extends Component {
   state = {
     players: [],
   };
@@ -10,6 +12,13 @@ export default class Ranking extends Component {
   componentDidMount() {
     this.loadPlayers();
   }
+
+  startNewGame = () => {
+    const { history, dispatch } = this.props;
+    dispatch(resetGame(0));
+    dispatch(resetTimer());
+    return history.push('/');
+  };
 
   loadPlayers = () => {
     const savedPlayers = JSON.parse(localStorage.players);
@@ -30,7 +39,14 @@ export default class Ranking extends Component {
     return (
       <div>
         <h1 data-testid="ranking-title">Ranking</h1>
-        <PlayAgainButton testId="btn-go-home" />
+        <button
+          type="button"
+          onClick={ this.startNewGame }
+          data-testid="btn-go-home"
+        >
+          Jogar Novamente
+
+        </button>
         { players.map((player, index) => (
           <Players
             index={ index }
@@ -44,3 +60,10 @@ export default class Ranking extends Component {
     );
   }
 }
+
+Ranking.propTypes = {
+  history: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
+};
+
+export default connect()(Ranking);
