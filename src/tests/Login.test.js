@@ -1,12 +1,39 @@
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from '../App'
 import { renderWithRouterAndRedux } from './helpers/renderWithRouterAndRedux';
 import { act } from "react-dom/test-utils";
+import Login from "../pages/Login";
+import Game from "../pages/Game";
+import mockData from './helpers/mockData';
+import mockToken from './helpers/mockToken';
 
+const mockFetchToken = () => Promise.resolve({
+  json: () => Promise.resolve(mockToken),
+});
+const mockFetchAPI = () => Promise.resolve({
+  json: () => Promise.resolve(mockData),
+});
 describe('Testes do Login', () => {
+  beforeEach(() => {
+    // global.fetch = jest.fn(mockFetchAPI);
+    // const initialState = {
+    //   user: {
+    //     username: 'alguem',
+    //     email: 'alguem@alguem.com',
+    //   },
+    //   game: {
+    //     questions: [],
+    //     error: '',
+    //     loading: false,
+    //     isTokenValid: false,
 
+    //     },
+
+    //   }
+    
+  });
 
 
   test('Os elementos aparecem na página', () => {
@@ -42,21 +69,53 @@ describe('Testes do Login', () => {
 
   });
 
-  test.only('Se os campos funcionam corretamente', async () => {
-    const { history } = renderWithRouterAndRedux(<App />);
+  test('Se os campos funcionam corretamente', async () => {
+        const initialState = {
+      user: {
+        username: 'alguem',
+        email: 'alguem@alguem.com',
+      },
+      game: {
+        questions: [],
+        error: '',
+        loading: false,
+        isTokenValid: false,
+
+        },
+
+      }
+      // const { history } = renderWithRouterAndRedux(<App />)
+    //  const initialEntries = ['./game'];
+
+ const {history} = renderWithRouterAndRedux(<App />);
+   
 
     const userEl = screen.getByTestId('input-player-name');
     const emailEl = screen.getByTestId('input-gravatar-email');
-    const loginBtn = screen.getByTestId('btn-play');
-    const settingsBtn = screen.getByTestId('btn-settings');
+    const button = screen.getByRole('button', {
+      name: /play!/i,
+    });
+    
+   
+    // const settingsBtn = screen.getByTestId('btn-settings');
 
     
     userEvent.type(userEl, 'asdfgsd');
-    userEvent.type(emailEl, 'asdfasd@asdfasdf.omc');
-    userEvent.click(loginBtn);
+    userEvent.type(emailEl, 'test@test.com');
+    userEvent.click(button);
+    const loading = await screen.findByTestId('load-element');
+    waitFor(()=> expect(loading).toBeInTheDocument());
+    await waitForElementToBeRemoved(loading);
+
+
+
+      // const initialEntries = ['/game'];
+    // const { history } = renderWithRouterAndRedux(<App />, { initialEntries , initialState});
     
-    const { pathname } = history.location;
-    await waitFor(() => expect(pathname).toBe('/game'));
+
+    // expect(global.fetch).toHaveBeenCalledTimes(4);
+
+   expect(history.location.pathname).toBe('/game');
 
 
   });
@@ -70,4 +129,44 @@ describe('Testes do Login', () => {
     const { pathname } = history.location;
     await waitFor(() => expect(pathname).toBe('/settings'));
   });
+  test("Verifica se a função fetch é chamada 2 vezes ",async()=>{
+    global.fetch = jest.fn(mockFetchAPI)
+    const initialState = {
+      user: {
+        username: 'alguem',
+        email: 'alguem@alguem.com',
+      },
+      game: {
+        questions: [],
+        error: '',
+        loading: false,
+        isTokenValid: false,
+
+        },
+
+      }
+
+     renderWithRouterAndRedux(<App />);
+   
+
+    const userEl = screen.getByTestId('input-player-name');
+    const emailEl = screen.getByTestId('input-gravatar-email');
+    const button = screen.getByRole('button', {
+      name: /play!/i,
+    });
+    
+   
+    // const settingsBtn = screen.getByTestId('btn-settings');
+
+    
+    userEvent.type(userEl, 'asdfgsd');
+    userEvent.type(emailEl, 'test@test.com');
+    userEvent.click(button);
+    
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+
+  
+
+
+  })
 });
