@@ -20,9 +20,26 @@ const mockFetchAPI = () => Promise.resolve({
   json: () => Promise.resolve(mockData),
 });
 describe('Testes do Game', () => {
-  beforeEach( async () => {
+  beforeEach(() => {
+    const json = jest.spyOn(global,'fetch');
+
     // jest.resetAllMocks()
-     global.fetch = jest.fn(mockFetchAPI);
+    //  global.fetch = jest.fn(mockFetchAPI);
+
+
+
+      })
+      
+
+    
+
+
+    
+
+
+
+
+  test('Os elementos aparecem do componente Header devem aparecer na página', async() => {
     const initialState = {
       user: {
         username: 'alguem',
@@ -48,22 +65,10 @@ describe('Testes do Game', () => {
           timerActive: false,
           timerDone: false,
         }
-
       }
-      const initialEntries = '/game';
+    const initialEntries = '/game';
      renderWithRouterAndRedux(<App />,  initialState, initialEntries);
 
-
-    
-
-
-    
-
-    
-  });
-
-
-  test('Os elementos aparecem do componente Header devem aparecer na página', async() => {
 
     const imageElement =await screen.findByTestId('header-profile-picture')
     const nameElement = await screen.findByTestId('header-player-name')
@@ -76,6 +81,35 @@ describe('Testes do Game', () => {
 
   });
   test('Os elementos aparecem do componente Trivia devem aparecer na página', async () => {
+    const initialState = {
+      user: {
+        username: 'alguem',
+        email: 'alguem@alguem.com',
+        avatar: '',
+      },
+      player:{
+        score: 0,
+        assertions: 0,
+      },
+      game: {
+        questions:mockData.results,
+        error: '',
+        loading: false,
+        isTokenValid: true,
+
+        },
+     
+        timer:{
+          secondsLeft: 0,
+          stopTime: false,
+          startTime: false,
+          timerActive: false,
+          timerDone: false,
+        }
+      }
+    const initialEntries = '/game';
+     renderWithRouterAndRedux(<App />,  initialState, initialEntries);
+
     const category = await screen.findByTestId("question-category");
     const question = await screen.findByTestId("question-text");
     const answer = await screen.findByTestId("answer-options");
@@ -98,24 +132,97 @@ describe('Testes do Game', () => {
     expect(answerCorrects).toBeDisabled()
 
   });
-  jest.setTimeout(8000);
+ jest.setTimeout(40000)
   it('As respostas devem ser habilitadas, contador aparecer e o botao "Proxima questao" deverá aparecer', async() => {
- 
-    screen.debug()
-    expect(await  screen.findByTestId("correct-answer")).toBeEnabled()
-    userEvent.click(await screen.findByTestId("correct-answer"));
-    await waitFor(()=>expect(screen.getByTestId("btn-next")).toBeInTheDocument());
-   
+    const initialState = {
+      user: {
+        username: 'alguem',
+        email: 'alguem@alguem.com',
+        avatar: '',
+      },
+      player:{
+        score: 0,
+        assertions: 0,
+      },
+      game: {
+        questions:mockData.results,
+        error: '',
+        loading: false,
+        isTokenValid: true,
 
-    // const incorrectAnswer =await screen.findByTestId("wrong-answer-0");
-    // userEvent.click(incorrectAnswer);
+        },
+     
+        timer:{
+          secondsLeft: 0,
+          stopTime: false,
+          startTime: false,
+          timerActive: false,
+          timerDone: false,
+        }
+      }
+    const initialEntries = '/game';
+    const {history} = renderWithRouterAndRedux(<App />,  initialState, initialEntries);
+
+    await new Promise((r) => setTimeout(r, 6000));
+    await waitFor( () => screen.getByText("Tempo: 30"));
+    await waitFor( () => screen.getByText("Tempo: 29"));
+
+   await waitFor(async ()=> expect( await screen.findByTestId("correct-answer")).toBeEnabled())
+    userEvent.click(await screen.findByTestId("correct-answer"));
+    await waitFor(async () =>expect( await screen.findByTestId("btn-next")).toBeInTheDocument());
+    userEvent.click( await screen.findByTestId("btn-next"))
+   userEvent.click( await screen.findByTestId("wrong-answer-0"))
+   userEvent.click( await screen.findByTestId("btn-next"))
+   userEvent.click( await screen.findByTestId("wrong-answer-0"))
+   userEvent.click( await screen.findByTestId("btn-next"))
+   userEvent.click( await screen.findByTestId("wrong-answer-0"))
+   userEvent.click( await screen.findByTestId("btn-next"))
+   userEvent.click( await screen.findByTestId("wrong-answer-0"))
+   userEvent.click( await screen.findByTestId("btn-next"))
+   const {pathname} = history.location;
+   await waitFor(()=>expect(pathname).toBe('/feedback'));
+
+
+
+  })
+  it('Verificar se o timer está funcionando...', async() => {
+    const initialState = {
+      user: {
+        username: 'alguem',
+        email: 'alguem@alguem.com',
+        avatar: '',
+      },
+      player:{
+        score: 0,
+        assertions: 0,
+      },
+      game: {
+        questions:mockData.results,
+        error: '',
+        loading: false,
+        isTokenValid: true,
+
+        },
+     
+        timer:{
+          secondsLeft: 0,
+          stopTime: false,
+          startTime: false,
+          timerActive: false,
+          timerDone: false,
+        }
+      }
+    const initialEntries = '/game';
+    renderWithRouterAndRedux(<App />,  initialState, initialEntries);
+    await new Promise((r) => setTimeout(r, 36500));
+    expect( await screen.findByTestId("correct-answer")).toBeDisabled()
+
+
+
 
     
 
 
-  }
-  )
-  
 
-
+  })
 });
