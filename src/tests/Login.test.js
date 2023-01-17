@@ -7,9 +7,12 @@ import { act } from "react-dom/test-utils";
 import Login from "../pages/Login";
 import Game from "../pages/Game";
 import mockData from './helpers/mockData';
+import invalidToken from "./helpers/invalidToke";
+
+
 
 const mockFetchToken = () => Promise.resolve({
-  json: () => Promise.resolve(mockToken),
+  json: () => Promise.resolve(invalidToken),
 });
 const mockFetchAPI = () => Promise.resolve({
   json: () => Promise.resolve(mockData),
@@ -139,4 +142,81 @@ describe('Testes do Login', () => {
 
 
   })
+  test("Verificar em caso de usar um token válido  ",async()=>{
+    jest.clearAllMocks()
+    // const mockFetchToken = () => Promise.resolve({
+    //   json: () => Promise.resolve(invalidToken),
+    // });
+    global.fetch = jest.fn(mockFetchToken)
+const initialState = {
+  game: {
+    questions:[],
+    error: '',
+    loading: false,
+    isTokenValid: false,
+
+    },
+}
+  
+
+ const {history} =  renderWithRouterAndRedux(<App />,initialState);
+ 
+
+  const userEl = screen.getByTestId('input-player-name');
+  const emailEl = screen.getByTestId('input-gravatar-email');
+  const button = screen.getByRole('button', {
+    name: /play!/i,
+  });
+  
+ 
+  act(()=>{    
+    userEvent.type(userEl, 'asdfgsd');
+    userEvent.type(emailEl, 'test@test.com');
+    userEvent.click(button);
+
+     
+  })
+  const {pathname} = history.location
+ await  waitFor(()=>expect(pathname).toBe('/')) 
+
+})
+// test('Verificar caso tenha algum erro na resposta',()=>{ 
+//   jest.clearAllMocks()
+
+//     const testUrl = 'https://opentdb.com/api.php?amount=5&token=INVALID_TOKEN';
+//     global.fetch = jest.fn(mockFetchToken);
+//     renderWithRouterAndRedux(<App />);
+//     const userEl = screen.getByTestId('input-player-name');
+//     const emailEl = screen.getByTestId('input-gravatar-email');
+//     const button = screen.getByRole('button', {
+//       name: /play!/i,
+//     });
+//     userEvent.type(userEl, 'asdfgsd');
+//     userEvent.type(emailEl, 'test@test.com');
+//     userEvent.click(button);
+ 
+//     userEvent.click(button);
+//     expect(global.fetch).toThrowError();
+
+// })
+});
+describe('Teste a aplicação com um token inválido', () => {
+  it('Teste a aplicação com um token inválido', async () => {
+    const initialState = {
+      user: {
+        username: 'alguem',
+        email: 'alguem@alguem.com',
+        avatar: '',
+      },
+      }
+
+      global.fetch = jest.fn().mockResolvedValue({
+          json: jest.fn().mockResolvedValue(invalidToken)
+      });
+      const { history } = renderWithRouterAndRedux(<App />, initialState, '/game');
+
+      act(() => {
+          history.push('/game')
+      })
+  });
 });
