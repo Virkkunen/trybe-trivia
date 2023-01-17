@@ -44,7 +44,7 @@ class Feedbacks extends Component {
 
   render() {
     return (
-      <div data-testid="feedback-text">
+      <div>
         <Header />
         <FeedBackMessage />
         <button

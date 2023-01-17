@@ -228,7 +228,7 @@ class Trivia extends Component {
             </div>
           ) : <Redirect to="/" />
         }
-        { redirect && <Redirect to="/feedbacks" />}
+        { redirect && <Redirect to="/feedback" />}
       </div>
     );
   }
